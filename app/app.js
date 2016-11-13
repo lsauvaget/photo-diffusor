@@ -1,0 +1,30 @@
+const express = require('express');
+const http = require('http');
+const PORT = process.env.PORT || 3000;
+const IO = require('./socket/IO.js');
+const slideshow = require('./lib/slideshow');
+const routes = require('./routes');
+const io = require('socket.io');
+const path = require('path');
+
+const app = express();
+const server = http.createServer(app);
+server.listen(PORT);
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+
+const prerequisite = [
+  slideshow.init()
+];
+
+Promise.all(prerequisite)
+.then(() => {
+  IO.create(server, io);
+  app.use(routes);
+});
+
+
+
+
+
