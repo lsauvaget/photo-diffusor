@@ -23,8 +23,3 @@ Promise.all(prerequisite)
   IO.create(server, io);
   app.use(routes);
 });
-
-
-
-
-
