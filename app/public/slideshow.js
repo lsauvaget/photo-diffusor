@@ -11,59 +11,84 @@ function easeInOutCubic(t, b, c, d) {
 };
 
 
-function animation(fn, TIMEOUT) {
+function animation(fn, timeout) {
     return new Promise((resolve, reject) => {
         let start = null;
         function animate(timestamp) {
             if(!start) {
                 start = timestamp;
             }
-            let progress = timestamp - start;
-            if( progress > TIMEOUT) {
+            let progress = Math.round(timestamp - start);
+            if( progress < timeout) {
+                fn(progress, timeout);
+                window.requestAnimationFrame(animate);
+            } else {
                 resolve();
-                return false;
             }
-            fn(Math.floor(progress), TIMEOUT);
-            window.requestAnimationFrame(animate);
         }
-        animate();
+        window.requestAnimationFrame(animate);
     });
+}
+
+function computeMaxBoundsWidthAndHeight(width, height, containerWidth, containerHeight) {
+    const ratio = width/height;
+    const landscapeOrientation = ratio > 0;
+    if(landscapeOrientation) {
+        const computedMaxHeight = containerWidth / ratio;
+        const computedMaxWidth = containerWidth;
+        const delta = containerHeight - computedMaxHeight;
+        if(delta < 0) {
+            const finalHeight = computedMaxHeight + delta;
+            const finalWidth = finalHeight * ratio;
+            return {
+                maxWidth: finalWidth,
+                maxHeight: finalHeight 
+            }
+        }
+        return {
+            maxWidth: computedMaxWidth,
+            maxHeight: computedMaxHeight
+        }
+    }else  {
+        const computedMaxHeight = containerHeight;
+        const computedMaxWidth = computedMaxHeight * ratio;
+        const delta = containerWidth - computedMaxWidth;
+        if(delta < 0) {
+            const finalWidth = computedMaxWidth + delta;
+            const finalHeight = finalHeight / ratio;
+            return {
+                maxWidth: finalWidth,
+                maxHeight: finalHeight 
+            }
+        }
+        return {
+            maxWidth: computedMaxWidth,
+            maxHeight: computedMaxHeight
+        }
+    }
+}
+
+function animateAfterImageLoad(img) {
+    return (event) => {
+        const {width, height} = img;
+        const {maxWidth, maxHeight} = computeMaxBoundsWidthAndHeight(width, height, window.innerWidth, window.innerHeight);
+
+        animation((timer, duration) => {
+            const scale = easeInOutCubic(timer, 1, 0.05, duration / 2);
+            context.clearRect(0, 0, width, height);
+            context.fillStyle = '#212121';
+            context.fillRect(0, 0, window.innerWidth, window.innerHeight);
+            context.drawImage(img, (window.innerWidth - maxWidth * scale) / 2, (window.innerHeight - maxHeight * scale) / 2, maxWidth * scale, maxHeight * scale);
+        }, 5000);
+    }
 }
 
 function draw(url) {
     const img = new Image();
     img.src = url;
-    img.onload = (e) => {
-        const ratio = img.height / img.width;
-        if (ratio < 1) {
-            animation((timer, duration) => {
-                let currWidth = 0;
-                let currHeight = 0;
-
-                if (timer < duration / 2) {
-                    const scale = easeInOutCubic(timer, 1, 0.05, duration / 2);
-                    context.clearRect(0, 0, width, height);
-                    currWidth = width * scale;
-                    currHeight = ratio * width * scale;
-                    context.drawImage(img, 0, 0, currWidth, currHeight);
-                } else {
-                    const scale = easeInOutCubic(timer, 1, 0.05, duration / 2);
-                    if(!scale) {
-                        return;
-                    }
-                    context.clearRect(0, 0, width, height);
-                    context.drawImage(img, 0, 0, width * scale, ratio * width * scale);
-                }
-            }, 5000);
-        }else {
-            context.drawImage(img, 0, 0, height / ratio, height);
-        }
-    }
+    img.onload = animateAfterImageLoad(img);
 }
 
-
-const counter = document.querySelector('#counter');
-const img = document.querySelector('#image');
 
 function next(){
   socket.emit('next');
@@ -82,46 +107,12 @@ document.onkeydown = (evt) => {
   }
 }
 
-
-
-class Photos {
-  constructor(photos = []) {
-    this._photos = photos;
-    this._cursor = 0;
-  }
-
-  static build(photos) {
-    return new Photos(photos);
-  }
-
-  populate(photos) {
-    this._photos = photos;
-  }
-
-  getCurrent() {
-    return this._photos[this._cursor];
-  }
-
-  next() {
-    this._cursor = this._cursor < this._photos.length -1 ? this._cursor + 1 : 0;
-    return this;
-  }
-
-  prev() {
-    this._cursor = this._cursor > 0 ? this._cursor - 1 : this._photos.length;
-    return this;
-  }
-}
-
-let photos = Photos.build();
-
 socket.on('init', (images) => {
-  photos.populate(images);
-  console.log(photos);
+  const current = images.findIndex(image => image.current);
+  draw(`${images[current].url}`);
 });
 
 socket.on('load', (images) => {
   const current = images.findIndex(image => image.current);
   draw(`${images[current].url}`);
-  //img.style.backgroundImage = `url('${images[current].url}')`;
 });
