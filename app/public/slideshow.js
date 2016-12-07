@@ -1,136 +1,150 @@
-const ImageLoader = (() => {
-    const imageLoader = {
-        init(canvas, options = {}){
-            this.canvas = canvas;
-            this.context = canvas.getContext('2d');
-            this._options = Object.assign({}, this._defaultOptions, options);
-            return this;
-        },
 
-        _easingEffects: {
-            easeInOutCubic(t, b, c, d) {
-                return c * Math.sin(t/d * (Math.PI/2)) + b;
-            }
-        },
+function ComputeImageSize(options) {
+    const _options = Object.assign({
+        imageSizeMode: 'contain'
+    }, options);
 
-        _defaultOptions: {
-            easing: 'easeInOutCubic',
-            imageSize: 'contain',
-            duration: 5000
-        },
+    function computeMaxHeightAndMaxWidth(width, height, containerWidth, containerHeight) {
+        const imageSizeMode = _options.imageSize;
+        const fn =  typeof imageSizeMode === 'function' ?  imageSizeMode : _computerImageSize[imageSizeMode];
+        return fn(width, height, containerWidth, containerHeight);
+    }
 
-        _easingEffect(t, b, c, d) {
-            const easing = this._options.easing;
-            const fn = typeof easing === 'function' ?  easing : this._easingEffects[easing];
-            return fn.call(this, t, b, c, d)
-        },
-
-        _computeMaxHeightAndMaxWidth(width, height, containerWidth, containerHeight) {
-            const imageSize = this._options.imageSize;
-            const fn =  typeof imageSize === 'function' ?  imageSize : this._computerImageSize[imageSize];
-            return fn.call(this, width, height, containerWidth, containerHeight);
-        },
-
-        _computerImageSize: {
-            contain(width, height, containerWidth, containerHeight){
-                const ratio = width/height;
-                const landscapeOrientation = ratio > 0;
-                if(landscapeOrientation) {
-                    const computedMaxHeight = containerWidth / ratio;
-                    const computedMaxWidth = containerWidth;
-                    const delta = containerHeight - computedMaxHeight;
-                    if(delta < 0) {
-                        const finalHeight = computedMaxHeight + delta;
-                        const finalWidth = finalHeight * ratio;
-                        return {
-                            maxWidth: finalWidth,
-                            maxHeight: finalHeight 
-                        }
-                    }
+    const _computerImageSize = {
+        contain(width, height, containerWidth, containerHeight) {
+            const ratio = width/height;
+            const landscapeOrientation = ratio > 0;
+            if(landscapeOrientation) {
+                const computedMaxHeight = containerWidth / ratio;
+                const computedMaxWidth = containerWidth;
+                const delta = containerHeight - computedMaxHeight;
+                if(delta < 0) {
+                    const finalHeight = computedMaxHeight + delta;
+                    const finalWidth = finalHeight * ratio;
                     return {
-                        maxWidth: computedMaxWidth,
-                        maxHeight: computedMaxHeight
+                        maxWidth: finalWidth,
+                        maxHeight: finalHeight 
                     }
-                }else  {
-                    const computedMaxHeight = containerHeight;
-                    const computedMaxWidth = computedMaxHeight * ratio;
-                    const delta = containerWidth - computedMaxWidth;
-                    if(delta < 0) {
-                        const finalWidth = computedMaxWidth + delta;
-                        const finalHeight = finalHeight / ratio;
-                        return {
-                            maxWidth: finalWidth,
-                            maxHeight: finalHeight 
-                        }
-                    }
-                    return {
-                        maxWidth: computedMaxWidth,
-                        maxHeight: computedMaxHeight
-                    }
-                }
-            },
-            cover(width, height, containerWidth, containerHeight){
-                const ratio = width/height;
-                if(ratio > 1) {
-                    return {
-                        maxWidth: containerWidth, 
-                        maxHeight: containerWidth / ratio
-                    };
                 }
                 return {
-                    maxWidth: containerHeight, 
-                    maxHeight: containerHeight * ratio
-                };
-            }
-        },
-
-        _animate(fn, timeout) {
-            return new Promise((resolve, reject) => {
-                let start = null;
-                function animate(timestamp) {
-                    if(!start) {
-                        start = timestamp;
-                    }
-                    let progress = Math.round(timestamp - start);
-                    if( progress < timeout) {
-                        fn(progress, timeout);
-                        window.requestAnimationFrame(animate);
-                    } else {
-                        resolve();
+                    maxWidth: computedMaxWidth,
+                    maxHeight: computedMaxHeight
+                }
+            }else  {
+                const computedMaxHeight = containerHeight;
+                const computedMaxWidth = computedMaxHeight * ratio;
+                const delta = containerWidth - computedMaxWidth;
+                if(delta < 0) {
+                    const finalWidth = computedMaxWidth + delta;
+                    const finalHeight = finalHeight / ratio;
+                    return {
+                        maxWidth: finalWidth,
+                        maxHeight: finalHeight 
                     }
                 }
-                window.requestAnimationFrame(animate);
-            });
+                return {
+                    maxWidth: computedMaxWidth,
+                    maxHeight: computedMaxHeight
+                }
+            }
         },
+        cover(width, height, containerWidth, containerHeight) {
+            const ratio = width/height;
+            if(ratio > 1) {
+                return {
+                    maxWidth: containerWidth, 
+                    maxHeight: containerWidth / ratio
+                };
+            }
+            return {
+                maxWidth: containerHeight, 
+                maxHeight: containerHeight * ratio
+            };
+        }
+    }
+    return { computeMaxHeightAndMaxWidth }
+}
 
+function Easing(options={}) {
+    const _options = Object.assign({
+        easing: 'easeInOutCubic',
+    }, options);
 
-        loadImage(url) {
-            const img = new Image();
-            img.src = url;
-            img.onload = this._draw.bind(this, img);
-            return img;
-        },
-
-        _draw(img) {
-            const {width, height} = img;
-            const {maxWidth, maxHeight} = this._computeMaxHeightAndMaxWidth(width, height, this.canvas.width, this.canvas.height);
-
-            this._animate((timer, duration) => {
-                const scale = this._easingEffect(timer, 1, 0.05, duration/ 2);
-                this.context.clearRect(0, 0, width, height);
-                this.context.fillStyle = '#212121';
-                this.context.fillRect(0, 0, window.innerWidth, window.innerHeight);
-                const marginLeft = (this.canvas.width - maxWidth * scale) / 2;
-                const marginRight = (this.canvas.height - maxHeight * scale) / 2;
-                this.context.drawImage(img, marginLeft , marginRight, maxWidth * scale, maxHeight * scale);
-            }, this._options.duration);
+    const _easingEffects = {
+        easeInOutCubic(t, b, c, d) {
+            return c * Math.sin(t/d * (Math.PI/2)) + b;
         }
     };
 
-    return (canvas, options) => {
-        return Object.create(imageLoader).init(canvas, options);
-    };
-})();
+    function easingEffect(t, b, c, d) {
+        const easing = _options.easing;
+        const fn = typeof easing === 'function' ?  easing : _easingEffects[easing];
+        return fn(t, b, c, d);
+    }
+
+    return { easingEffect };
+}
+
+
+function Animate() {
+    function animate(fn, timeout) {
+        console.log('test')
+        return new Promise((resolve, reject) => {
+            let start = null;
+            function f(timestamp) {
+                if(!start) {
+                    start = timestamp;
+                }
+                let progress = Math.round(timestamp - start);
+                if( progress < timeout) {
+                    fn(progress, timeout);
+                    window.requestAnimationFrame(f);
+                } else {
+                    resolve();
+                }
+            }
+            window.requestAnimationFrame(f);
+        });
+    }
+    return {animate}
+};
+
+function ImageLoader(canvas, options={}) {
+    const context = canvas.getContext('2d');
+    const _options = Object.assign({
+        duration: 5000
+    }, options);
+
+    const {easingEffect} = Easing(_options);
+    const {computeMaxHeightAndMaxWidth} = ComputeImageSize(_options);
+    const {animate} = Animate(_options);
+
+    function _drawImage(img) {
+        return (evt) => {
+            const {width, height} = img;
+            const {maxWidth, maxHeight} = computeMaxHeightAndMaxWidth(width, height, canvas.width, canvas.height);
+            animate((timer, duration) => {
+                const scale = easingEffect(timer, 1, 0.05, duration/ 2);
+                context.clearRect(0, 0, width, height);
+                context.fillStyle = '#212121';
+                context.fillRect(0, 0, canvas.width, canvas.height);
+                const marginLeft = (canvas.width - maxWidth) / 2;
+                const marginRight = (canvas.height - maxHeight * scale) / 2;
+                context.drawImage(img, marginLeft , marginRight, maxWidth * scale, maxHeight * scale);
+            }, _options.duration);
+        }
+    }
+
+    function loadImage(url) {
+        const img = new Image();
+        img.src = url;
+        //img.onload = _drawImage(img);
+        img.onload = _drawImage(img);
+        return img;
+    }
+
+    return {loadImage};
+}
 
 
 const socket = io();
