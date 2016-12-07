@@ -1,1 +1,0 @@
-var imgs = [{"url":"img1.jpg"},{"url":"img2.jpg"}]
