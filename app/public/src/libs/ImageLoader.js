@@ -12,6 +12,7 @@ function ImageLoader(canvas, options={}) {
     const {computeMaxHeightAndMaxWidth} = ComputeImageSize(_options);
     const {animate} = Animate(_options);
 
+
     function _drawImage(img) {
         return (evt) => {
             const {width, height} = img;

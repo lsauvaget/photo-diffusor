@@ -1,7 +1,11 @@
+const root = document.querySelector('#root');
 
-if(/slideshow$/.test(location.pathname)){
-    require('./slideshow.js');
-}else {
-    require('./remote.js');
+window.onload = () => {
+    switch(location.pathname) {
+        case '/slideshow':
+            root.appendChild(require('./slideshow/index.js'));
+            break;
+        default:
+            root.appendChild(require('./remote/index.js'));
+    }
 }
-

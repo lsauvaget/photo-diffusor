@@ -24,7 +24,7 @@ function h(type, attrs={}, ...childs) {
   return elm;
 }
 
-const dom = ['H1', 'H2', 'H3', 'P', 'LABEL', 'IMG', 'INPUT', 'DIV', 'SPAN', 'HR']
+const dom = ['H1', 'H2', 'H3', 'P', 'LABEL', 'IMG', 'INPUT', 'DIV', 'SPAN', 'HR', 'BUTTON', 'CANVAS']
   .reduce((acc,type) => {
     acc[type.toLowerCase()] = (...args) => h(type, ...args);
     return acc;

@@ -1,10 +1,19 @@
 const socket = io();
-const ImageLoader = require('./libs/ImageLoader.js');
+const ImageLoader = require('../libs/ImageLoader.js');
+const {div, canvas} = require('../libs/Dom.js');
 
-const canvas = document.querySelector('#canvas');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-const imageLoader  = ImageLoader(canvas, {imageSize: 'cover'});
+const wrapper = canvas => div({className: 'slideshow'}, canvas) 
+
+const canvasForDisplaySlideshow = canvas({
+    className:'slideshow__canvas',
+    width: window.innerWidth,
+    height: window.innerHeight
+});
+
+module.exports = wrapper(canvasForDisplaySlideshow);
+
+
+const imageLoader  = ImageLoader(canvasForDisplaySlideshow, {imageSize: 'cover'});
 
 
 function next(){
@@ -24,7 +33,6 @@ document.onkeydown = (evt) => {
   }
 }
 
-console.log(socket)
 
 socket.on('init', (images) => {
     const current = images.findIndex(image => image.current);
@@ -35,3 +43,4 @@ socket.on('load', (images) => {
     const current = images.findIndex(image => image.current);
     imageLoader.loadImage(`${images[current].url}`);
 });
+
