@@ -29,3 +29,5 @@ const dom = ['H1', 'H2', 'H3', 'P', 'LABEL', 'IMG', 'INPUT', 'DIV', 'SPAN', 'HR'
     acc[type.toLowerCase()] = (...args) => h(type, ...args);
     return acc;
   }, {});
+
+module.exports = dom;

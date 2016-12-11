@@ -1,0 +1,20 @@
+{
+  "name": "front-end",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --progress --color",
+    "watch": "webpack --progress --color --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-core": "^6.20.0",
+    "webpack": "^1.14.0"
+  },
+  "dependencies": {
+    "babel-loader": "^6.2.9"
+  }
+}

@@ -12,7 +12,7 @@ class Slideshow {
   init() {
     this.getImgs()
     .then(state => {
-      this.state = state;
+        this.state = state;
     });
   }
 
