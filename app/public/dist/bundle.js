@@ -114,7 +114,7 @@
 	function ImageLoader(canvas, options = {}) {
 	    const context = canvas.getContext('2d');
 	    const _options = Object.assign({
-	        duration: 5000
+	        duration: 2500
 	    }, options);
 	
 	    const { easingEffect } = Easing(_options);
@@ -126,7 +126,7 @@
 	            const { width, height } = img;
 	            const { maxWidth, maxHeight } = computeMaxHeightAndMaxWidth(width, height, canvas.width, canvas.height);
 	            animate((timer, duration) => {
-	                const scale = easingEffect(timer, 1, 0.05, duration / 2);
+	                const scale = easingEffect(timer, 1, 0.05, duration);
 	                context.clearRect(0, 0, width, height);
 	                context.fillStyle = '#212121';
 	                context.fillRect(0, 0, canvas.width, canvas.height);
@@ -316,18 +316,44 @@
 /* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
-	const { button, div } = __webpack_require__(6);
+	const { button, div, img } = __webpack_require__(6);
 	const socket = io();
 	
 	function next() {
-	  socket.emit('next');
+	    socket.emit('next');
 	}
 	
 	function prev() {
-	  socket.emit('prev');
+	    socket.emit('prev');
 	}
 	
-	module.exports = div({ className: 'remote' }, button({ className: 'remote__button', textContent: 'prev', onclick: prev }), button({ className: 'remote__button', textContent: 'next', onclick: next }));
+	const wrapper = (...wrapped) => div({ className: 'remote' }, ...wrapped);
+	
+	const buttons = div({ className: 'remote__buttons' }, button({ className: 'remote__buttons__prev', textContent: 'prev', onclick: prev }), button({ className: 'remote__buttons__next', textContent: 'next', onclick: next }));
+	
+	const gallery = div({ className: 'remote__gallery' });
+	
+	const images = imgs => div({ className: 'remote__gallery__items' }, ...imgs.map(obj => {
+	    return obj.current ? img({ className: 'remote__gallery__items__item remote__gallery__items__item--current', src: obj.url }) : img({ className: 'remote__gallery__items__item', src: obj.url });
+	}));
+	
+	socket.on('init', imgs => {
+	    gallery.appendChild(images(imgs));
+	});
+	
+	socket.on('load', imgs => {
+	    const current = imgs.findIndex(image => image.current);
+	    [...gallery.childNodes[0].childNodes].forEach((e, i) => {
+	        if (~e.classList.contains('current')) {
+	            e.classList.toggle('remote__gallery__items__item--current');
+	        }
+	        if (i === current) {
+	            e.classList.toggle('remote__gallery__items__item--current');
+	        }
+	    });
+	});
+	
+	module.exports = wrapper(buttons, gallery);
 
 /***/ }
 /******/ ]);

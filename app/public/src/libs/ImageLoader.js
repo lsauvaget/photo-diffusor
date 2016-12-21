@@ -5,7 +5,7 @@ const Animate = require('./Animation.js');
 function ImageLoader(canvas, options={}) {
     const context = canvas.getContext('2d');
     const _options = Object.assign({
-        duration: 5000
+        duration: 2500
     }, options);
 
     const {easingEffect} = Easing(_options);
@@ -18,7 +18,7 @@ function ImageLoader(canvas, options={}) {
             const {width, height} = img;
             const {maxWidth, maxHeight} = computeMaxHeightAndMaxWidth(width, height, canvas.width, canvas.height);
             animate((timer, duration) => {
-                const scale = easingEffect(timer, 1, 0.05, duration/ 2);
+                const scale = easingEffect(timer, 1, 0.05, duration);
                 context.clearRect(0, 0, width, height);
                 context.fillStyle = '#212121';
                 context.fillRect(0, 0, canvas.width, canvas.height);
