@@ -1,12 +1,17 @@
-const imagesPath = require('../../config.js').public.images.absPath;
-const publicImagePath = require('../../config.js').public.images.publicPath;
-const {imageSource} = require('../../config.js');
+const config = require('../../config.js');
 const Slideshow = require('./Slideshow.js');
+const FlickrAdapter = require('./FlickrAdapter.js');
+const FilesystemAdapter = require('./FilesystemAdapter.js');
 
 const adapters = {
-    flickr: require('./FlickrAdapter.js')(imagesPath, publicImagePath),
-    fileSystem: require('./FilesystemAdapter.js')()
+    flickr: FlickrAdapter({
+        api_key: config.flickr.apiKey
+    }),
+    fileSystem: FilesystemAdapter({
+        imagesPath: config.public.images.absPath,
+        publicImagePath: config.public.images.publicPath 
+    })
 }
 
 
-module.exports = new Slideshow(adapters[imageSource]);
+module.exports = Slideshow(adapters[config.dataSource]);

@@ -2,47 +2,57 @@ const fs = require('fs');
 const bluebird = require('bluebird');
 bluebird.promisifyAll(fs);
 
+module.exports = Slideshow;
 
-class Slideshow {
-  constructor(getImages) {
-      this.state = [];
-      this.getImages = getImages;
-  }
-
-  init() {
-    this.getImgs()
-    .then(state => {
-        this.state = state;
-    });
-  }
-
-  getImgs() {
-    return this.getImages()
-    .then(files => {
-      return files
-      .reduce((acc, e, i) => {
-        return i !== 0 ? acc.concat(e) : acc.concat(Object.assign({}, e, {current: true}));
-      }, []);
-    })
-  }
-
-  getState() {
-    return this.state;
-  }
-
-  nextFrame() {
-    let cursorPos = this.state.findIndex(e => e.current);
-    let nextCursorPos = cursorPos < this.state.length - 1  ? cursorPos + 1 : 0;
-    this.state[cursorPos].current = false;
-    this.state[nextCursorPos].current = true;
-  }
-
-  prevFrame() {
-    let cursorPos = this.state.findIndex(e => e.current);
-    let prevCursorPos = cursorPos - 1 < 0 ? this.state.length-1 : cursorPos - 1;
-    this.state[cursorPos].current = false;
-    this.state[prevCursorPos].current = true;
-  }
+const unimplementedMethod = (name) => {
+    return () => {
+        throw new Error(`Not Implemented Method ${name}`);
+    }
 }
 
-module.exports = Slideshow;
+function Slideshow(adapter = {}) {
+    const getImages = adapter.getImages || unimplementedMethod('getImages');
+
+    let _state = {};
+
+    function init() {
+        return getImgs()
+            .then(state => {
+                _state = state;
+            });
+    }
+
+    function getImgs() {
+        return getImages()
+            .then(files => {
+                files[0].current = true;
+                return files;
+            });
+    }
+
+    function getState() {
+        return _state;
+    }
+
+    function nextFrame() {
+        let cursorPos = _state.findIndex(e => e.current);
+        let nextCursorPos = cursorPos < _state.length - 1  ? cursorPos + 1 : 0;
+        _state[cursorPos].current = false;
+        _state[nextCursorPos].current = true;
+    }
+
+    function prevFrame() {
+        let cursorPos = _state.findIndex(e => e.current);
+        let prevCursorPos = cursorPos - 1 < 0 ? _state.length-1 : cursorPos - 1;
+        _state[cursorPos].current = false;
+        _state[prevCursorPos].current = true;
+    }
+
+    return {
+        init,
+        getImgs,
+        nextFrame,
+        prevFrame,
+        getState
+    }
+}

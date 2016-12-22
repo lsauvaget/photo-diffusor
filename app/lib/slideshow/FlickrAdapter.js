@@ -1,9 +1,8 @@
 const rp = require('request-promise');
-const {apiKey} = require('../../config.js').flickr;
 const restUri = 'https://api.flickr.com/services/rest';
 const qsDefault = { 
     method: 'flickr.photosets.getPhotos',
-    api_key,
+    api_key: '',
     photoset_id: '72157656480936626',
     user_id: '43594131@N06',
     extras: 'url_sq, url_t, url_s, url_m, url_o',

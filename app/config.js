@@ -1,6 +1,11 @@
 const configs = {};
 
-configs.imageSource = 'flickr' //or filesystem
+configs.dataSources = {
+    FILESYSTEM: 'fileSystem',
+    FLICKR: 'flickr'
+}
+
+configs.dataSource = configs.dataSources.FILESYSTEM;
 configs.public = {
     absPath: `${__dirname}/public`,
 };

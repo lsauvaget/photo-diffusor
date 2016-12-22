@@ -20,12 +20,12 @@ const buttons = div({className: 'remote__buttons'},
 const gallery = div({className: 'remote__gallery'});
 
 const images = imgs => div({className: 'remote__gallery__items'},
-    ...imgs.map(obj => {
-        return (
-            obj.current ?  img({className: 'remote__gallery__items__item remote__gallery__items__item--current', src: obj.url}) :
-                img({className: 'remote__gallery__items__item', src: obj.url})
-        )
-    })
+    //...imgs.map(obj => {
+        //return (
+            //obj.current ?  img({className: 'remote__gallery__items__item remote__gallery__items__item--current', src: obj.url}) :
+                //img({className: 'remote__gallery__items__item', src: obj.url})
+        //)
+    //})
 );
 
 socket.on('init', (imgs) => {
