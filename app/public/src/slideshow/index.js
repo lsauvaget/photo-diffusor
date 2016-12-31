@@ -36,11 +36,11 @@ document.onkeydown = (evt) => {
 
 socket.on('init', (images) => {
     const current = images.findIndex(image => image.current);
-    imageLoader.loadImage(`${images[current].url}`);
+    imageLoader.loadImage(`${images[current].fullSize}`);
 });
 
 socket.on('load', (images) => {
     const current = images.findIndex(image => image.current);
-    imageLoader.loadImage(`${images[current].url}`);
+    imageLoader.loadImage(`${images[current].fullSize}`);
 });
 

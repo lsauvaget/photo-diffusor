@@ -22,7 +22,9 @@ module.exports = (options = {}) => {
                 console.log(photosets)
                 return photosets.photoset.photo.map(photo => {
                     return {
-                        url: photo.url_o
+                        fullSize: photo.url_o,
+                        thumbnail: photo.url_s,
+                        name: photo.title
                     }
                 });
             });
