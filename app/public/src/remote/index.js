@@ -12,20 +12,19 @@ function prev(){
 const wrapper = (...wrapped) => div({className: 'remote'}, ...wrapped)
 
 const buttons = div({className: 'remote__buttons'},
-    button({className: 'remote__buttons__prev', textContent: 'prev', onclick: prev}),
-    button({className: 'remote__buttons__next', textContent: 'next', onclick: next}),
+    button({className: 'remote__buttons__prev', textContent: '<', onclick: prev}),
+    button({className: 'remote__buttons__next', textContent: '>', onclick: next}),
 );
 
 
 const gallery = div({className: 'remote__gallery'});
 
 const images = imgs => div({className: 'remote__gallery__items'},
-    //...imgs.map(obj => {
-        //return (
-            //obj.current ?  img({className: 'remote__gallery__items__item remote__gallery__items__item--current', src: obj.url}) :
-                //img({className: 'remote__gallery__items__item', src: obj.url})
-        //)
-    //})
+    ...imgs.map(obj => {
+        return (
+            img({className: 'remote__gallery__items__item', src: obj.thumbnail})
+        )
+    })
 );
 
 socket.on('init', (imgs) => {

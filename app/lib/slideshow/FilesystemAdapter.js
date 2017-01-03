@@ -21,7 +21,8 @@ module.exports = (options) => {
             const promises = images.map((image) => {
                 return new Promise((resolve, reject) => {
                     sharp(`${options.imagesPath}/${image}`)
-                        .resize(200)
+                        .resize(400, 400)
+                        .crop(sharp.strategy.attention)
                         .toFile(`${thumbnailFile}/${image}`, err => {
                             err ? reject(`${err} : ${options.imagesPath}/${image}`) : resolve(image);
                         });

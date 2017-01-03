@@ -25,4 +25,33 @@ html, body {
   width 100px;
   height: auto;
 }
+.remote__buttons__prev,
+.remote__buttons__next {
+    width: 100px;
+    background: #2d2d2d;
+    border: 0;
+    height: 100px;
+    margin: 30px;
+    color: aliceblue;
+}
+.remote__buttons {
+    text-align: center;
+    background: #232323;
+    position: fixed;
+    width: 100%;
+}
 
+.remote__gallery__items {
+   display: flex; 
+   flex-flow: row wrap;
+   justify-content: space-around;
+   background: rgb(35, 35, 35);
+   padding-top: 160px;
+}
+
+.remote__gallery__items__item {
+   margin: 20px;
+   width: 200px;
+   height: 200px;
+   border: 45px solid #2d2d2d;
+}
