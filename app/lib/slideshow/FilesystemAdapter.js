@@ -1,45 +1,67 @@
+const adapterInterface = require('./Adapter.js');
 const fs = require('fs.extra');
 const Promise = require('bluebird');
 const sharp = require('sharp');
 
 Promise.promisifyAll(fs);
 
-module.exports = (options) => {
-    const thumbnailFile = `${options.imagesPath}/thumbnail`;
 
-    function getImages() {
-        return Promise.resolve()
-            .then(() => fs.readdirAsync(options.imagesPath))
-            .then(files => {
-                return files.filter(e => /\.jpg$/.test(e));
-            })
-        .then(images => {
-            try{
-                fs.rmrfSync(thumbnailFile);
-            }catch(err){}
-            fs.mkdirSync(thumbnailFile);
-            const promises = images.map((image) => {
-                return new Promise((resolve, reject) => {
-                    sharp(`${options.imagesPath}/${image}`)
-                        .resize(400, 400)
-                        .crop(sharp.strategy.attention)
-                        .toFile(`${thumbnailFile}/${image}`, err => {
-                            err ? reject(`${err} : ${options.imagesPath}/${image}`) : resolve(image);
-                        });
+function readImageFiles(imagesPath) {
+    return fs.readdirAsync(imagesPath) 
+        .then(files => {
+            return files.filter(e => /\.jpg$/.test(e));
+        })
+}
+
+function removeThenCreateFolder(thumbnailFile) {
+    try{
+        fs.rmrfSync(thumbnailFile);
+    }catch(err){}
+    fs.mkdirSync(thumbnailFile);
+}
+
+function resizeThenRecordImageFile(sourceImagePath, destImagePath) {
+    return (imageName) => {
+        new Promise((resolve, reject) => {
+            sharp(`${sourceImagePath}/${imageName}`)
+                .resize(400, 400)
+                .crop(sharp.strategy.attention)
+                .toFile(`${destImagePath}/${imageName}`, err => {
+                    err ? reject(`${err} : ${sourceImagePath}/${imageName}`) : resolve(imageName);
                 });
-            });
-            return Promise.all(promises);
-        })
-        .then(images => {
-            return images.map(image => ({
-                name: image,
-                fullSize: `${options.publicImagePath}/${encodeURI(image)}`,
-                thumbnail:`${options.publicImagePath}/thumbnail/${encodeURI(image)}` 
-            }))
-        })
-        .catch(error => {
-            console.log(error);
         });
+    };
+}
+
+
+const fileSystemAdapter = Object.assign(Object.create(adapterInterface), {
+    init(options) {
+        this.options = options;
+        this.thumbnailFile = `${options.imagesPath}/thumbnail`;
+    },
+
+    getImages() {
+        return readImageFiles(this.options.imagesPath)
+            .then(images => {
+                removeThenCreateFolder(this.thumbnailFile);
+                const thumbnail = resizeThenRecordImageFile(this.options.imagesPath,this.thumbnailFile);
+                return Promise.all(images.map(thumbnail));
+            })
+            .then(images => {
+                return images.map(image => ({
+                    name: image,
+                    fullSize: `${this.options.publicImagePath}/${encodeURI(image)}`,
+                    thumbnail:`${this.options.publicImagePath}/thumbnail/${encodeURI(image)}` 
+                }))
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }
-    return {getImages};
+})
+
+module.exports = (options) => {
+    const _fileSystemAdapter = Object.create(fileSystemAdapter);
+    _fileSystemAdapter.init(options);
+    return _fileSystemAdapter;
 }

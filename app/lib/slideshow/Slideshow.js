@@ -11,8 +11,6 @@ const unimplementedMethod = (name) => {
 }
 
 function Slideshow(adapter = {}) {
-    const getImages = adapter.getImages || unimplementedMethod('getImages');
-
     let _state = {};
 
     function init() {
@@ -23,7 +21,7 @@ function Slideshow(adapter = {}) {
     }
 
     function getImgs() {
-        return getImages()
+        return adapter.getImages()
             .then(files => {
                 files[0].current = true;
                 return files;
