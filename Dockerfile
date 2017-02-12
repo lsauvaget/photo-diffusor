@@ -1,0 +1,17 @@
+FROM node:7.5.0
+
+ENV PHOTO_DIFFUSOR_SERVER_PATH /usr/src/photo-diffusor
+
+RUN mkdir -p $PHOTO_DIFFUSOR_SERVER_PATH
+
+WORKDIR $PHOTO_DIFFUSOR_SERVER_PATH
+
+COPY app "$PHOTO_DIFFUSOR_SERVER_PATH/app"
+
+COPY package.json $PHOTO_DIFFUSOR_SERVER_PATH
+
+RUN npm install --production
+
+EXPOSE $PORT
+
+CMD ["npm", "run", "start"]
