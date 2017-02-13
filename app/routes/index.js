@@ -1,9 +1,13 @@
-const Router = require('express').Router();
+const router = require('express').Router({mergeParams: true});
 const absPath = require('../config.js').public.absPath;
 
-Router.get('*', (req, res) => {
+router.get('/status', (req, res) => {
+  res.send('Ok');
+});
+
+router.get('*', (req, res) => {
   res.sendFile(`${absPath}/index.html`);
 });
 
 
-module.exports = Router;
+module.exports = router;

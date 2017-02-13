@@ -9,7 +9,6 @@ const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
-server.listen(PORT);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -22,4 +21,9 @@ Promise.all(prerequisite)
 .then(() => {
   IO.create(server, io);
   app.use(routes);
+})
+.then(() => {
+    server.listen(PORT, () => {
+        console.log(`server listen on ${PORT}`)
+    });
 });
