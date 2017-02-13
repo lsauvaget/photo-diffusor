@@ -1,0 +1,15 @@
+machine:
+  node:
+    version: 6.9.0
+
+compile:
+  override:
+    - npm i -g webpack
+    - cd app/public && npm install && npm run build
+
+deployment:
+  staging:
+    branch: master
+    heroku:
+      appname: frozen-taiga-37600
+

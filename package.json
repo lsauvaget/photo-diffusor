@@ -15,9 +15,8 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app/app.js",
-    "heroku-postbuild": "cd app/public && npm install && ls node_modules"
+    "test": "echo 1",
+    "start": "node app/app.js"
   },
   "author": "",
   "license": "ISC"
