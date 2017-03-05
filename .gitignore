@@ -2,3 +2,5 @@ node_modules
 npm-debug.log
 app/public/dist
 app/public/dist/**/*
+app/public/images/full/**/*.jpg
+app/public/images/thumbnail/**/*.jpg
