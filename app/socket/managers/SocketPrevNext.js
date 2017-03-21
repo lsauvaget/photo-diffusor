@@ -8,14 +8,17 @@ class SocketPrevNext extends AbstractSocketEvent{
 
   attachEvents(io, socket) {
     socket.on('next', () => {
-      slideshow.nextFrame();
-      io.emit('load', slideshow.getState());
+      socket.to(socket.socketId).emit('next');
     });
 
     socket.on('prev', () => {
-      slideshow.prevFrame();
-      io.emit('load', slideshow.getState());
+      socket.to(socket.socketId).emit('prev');
     });
+
+    socket.on('select', (medium) => {
+      socket.to(socket.socketId).emit('select', {selectedMedium: medium});
+    });
+
   }
 }
 
