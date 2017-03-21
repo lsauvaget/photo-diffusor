@@ -1,7 +1,7 @@
 const express = require('express');
 const http = require('http');
 const PORT = process.env.PORT || 3000;
-const IO = require('./socket/IO.js');
+const {IO} = require('./socket');
 const slideshow = require('./lib/slideshow');
 const routes = require('./routes');
 const io = require('socket.io');

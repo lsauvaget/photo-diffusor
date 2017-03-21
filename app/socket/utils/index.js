@@ -1,1 +1,3 @@
-module.exports = require('./SocketManagerHelper.js');
+module.exports = {
+    socketManager: require('./SocketManagerHelper.js'),
+}

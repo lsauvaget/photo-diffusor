@@ -1,20 +1,8 @@
-const SocketManagerHelper = require('./utils/SocketManagerHelper.js');
+const {socketManager} = require('./utils');
 
-class IO {
-  constructor(server, io) {
-    this.io = io(server);
-    this.init();
-  }
-
-  static create(server, io) {
-    return new IO(server, io);
-  }
-
-  init() {
-    this.io.on('connection', socket => {
-      new SocketManagerHelper(socket, this.io);
-    });
-  }
+module.exports = {
+    create: (server, io) => {
+        const instance = io(server);
+        instance.on('connection', socketManager.bind(null, instance));
+    }
 }
-
-module.exports = IO;
