@@ -1,6 +1,7 @@
 const AbstractSocketEvent = require('./AbstractSocketEvent.js');
 const slideshow = require('../../lib/slideshow');
-const uuidV4 = require('uuid/v4')
+const uuidV4 = require('uuid/v4');
+const {getShortLink} = require('../../lib/shortLink.js');
 
 
 class SocketInit extends AbstractSocketEvent{
@@ -17,7 +18,6 @@ class SocketInit extends AbstractSocketEvent{
     socket.emit('init', slideshow.getState());
 
     socket.on('joinRoom', (socketId) => {
-        console.log(socketId)
         socket.leave(socket.socketId);
         socket.join(socketId);
         socket.socketId = socketId;

@@ -15,8 +15,13 @@ configs.public.images = {
   absPath:`${configs.public.absPath}/images`,
 }
 
-configs.flickr = {};
-configs.flickr.apiKey = '0700a294e35387ab04d59292a0e4a4dd';
+configs.flickr = {
+    apiKey: process.env.FLICK_API_KEY
+};
+
+configs.shortner = {
+    key: process.env.GOOGLE_SHORTNER_API_KEY
+};
 
 
 

@@ -6,6 +6,7 @@ const slideshow = require('./lib/slideshow');
 const routes = require('./routes');
 const io = require('socket.io');
 const path = require('path');
+const cors = require('cors');
 
 const app = express();
 const server = http.createServer(app);
@@ -20,6 +21,7 @@ const prerequisite = [
 Promise.all(prerequisite)
 .then(() => {
   IO.create(server, io);
+  app.use(cors());
   app.use(routes);
 })
 .then(() => {
